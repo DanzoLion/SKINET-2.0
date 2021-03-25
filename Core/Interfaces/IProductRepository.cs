@@ -6,7 +6,7 @@ namespace Core.Interfaces
 {
     public interface IProductRepository
     {
-         Task<Product> GetProductByIdAsync(int id);                      // these are our interface members
+         Task<Product> GetProductByIdAsync(int id);                      // these are our interface members         // these get a list of things ..
         Task<IReadOnlyList<Product>> GetProductsAsync();          // we return a list of items here and we are specific about a Read Only list in this case
         Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync();          // temporatily, we are adding all our types under a single repository as we build up the application 
         Task<IReadOnlyList<ProductType>> GetProductTypesAsync();          // 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Helpers;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +33,8 @@ namespace API
         public void ConfigureServices(IServiceCollection services)                                                                                      // ordering not important here
         {
             services.AddScoped<IProductRepository, ProductRepository>();      // created when http request incoming to API  // creates instance of controller // controller creates instance of repository // when req. finished disposes of cont. and rep.
+            services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));  // we don't know the type, and the type is collected at compile/run-time so slightly different config here
+            services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();                                                                                                                                          // gives access to endpoints added as a service
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));  // access to our database // via connection string and <StoreContext>
             services.AddSwaggerGen(c =>
@@ -55,6 +58,7 @@ namespace API
             app.UseHttpsRedirection();   // automatically re-directs to https
 
             app.UseRouting();
+            app.UseStaticFiles();        // added when we imported our images folder into our project // this is middleware
 
             app.UseAuthorization();
 
