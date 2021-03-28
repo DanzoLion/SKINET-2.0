@@ -2,19 +2,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Dtos;
+using API.Errors;
 using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc; // ActionResult
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers {
 
-    [ApiController] // endpoint attribute
-    [Route ("api/[controller]")] // route attribute
-    public class ProductsController : ControllerBase {
+    // [ApiController] // endpoint attribute
+    // [Route ("api/[controller]")] // route attribute          // created BaseApiController.cs
+        public class ProductsController : BaseApiController {
         private readonly IGenericRepository<Product> _productsRepo;
         private readonly IGenericRepository<ProductBrand> _productBrandRepo;
         private readonly IGenericRepository<ProductType> _productTypeRepo;
@@ -57,15 +59,19 @@ namespace API.Controllers {
         }
 
         [HttpGet ("{id}")] // differentiates our attribute via {id} // https://localhost:5001/api/products/123
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]     // these attributes allow us to be more specific about the error codes represented in swagger
         public async Task<ActionResult<ProductToReturnDto>> GetProduct (int id) // id is our product id
         {
             // return "single product";
           //  return await _repo.GetProductByIdAsync(id); // id returns our products form the database 
 
-            var spec = new ProductsWithTypesAndBrandsSpecification(id);   // we pass in id from our root parameter above 
+        var spec = new ProductsWithTypesAndBrandsSpecification(id);   // we pass in id from our root parameter above 
           //  return await _productsRepo.GetByIdAsync(id); // id returns our products form the database 
           //  return await _productsRepo.GetEntityWithSpec(spec); // implements the method from IGenericRepository
           var product = await _productsRepo.GetEntityWithSpec(spec); // implements the method from IGenericRepository
+
+          if (product == null) return NotFound(new ApiResponse(404));  // if null is found generate ApiResponse 404 not found
           return _mapper.Map<Product, ProductToReturnDto>(product); // we map from product to ProductToReturnDto and pass in product
         //   {
         //       Id = product.Id,
