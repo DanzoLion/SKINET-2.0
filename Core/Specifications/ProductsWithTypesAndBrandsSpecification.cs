@@ -6,10 +6,35 @@ namespace Core.Specifications
 {
     public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product>
     {
-        public ProductsWithTypesAndBrandsSpecification()
+        public ProductsWithTypesAndBrandsSpecification(ProductSpecParams productParams)     // performs product sort
+        : base( x =>
+        (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains(productParams.Search)) &&                  // filter for product string name
+        (!productParams.BrandId.HasValue || x.ProductBrandId == productParams.BrandId) &&                   // filter for product ProductBrandId then ProductTypeId
+        (!productParams.TypeId.HasValue || x.ProductTypeId == productParams.TypeId)
+        )
         {
             AddInclude(x => x.ProductType);
             AddInclude(x => x.ProductBrand);
+            AddOrderBy(x => x.Name);
+            ApplyPaging(productParams.PageSize * (productParams.PageIndex -1), productParams.PageSize);             // we add skip -> how many do we want to skip, how many do we want to take?
+
+            if (!string.IsNullOrEmpty(productParams.Sort))
+            {
+                switch (productParams.Sort)
+                {
+                    case "priceAsc":
+                        AddOrderBy(p => p.Price);
+                        break;
+                    
+                    case "priceDesc":
+                        AddOrderByDescending(p => p.Price);
+                        break;
+                    
+                    default:
+                        AddOrderBy(n => n.Name);
+                        break;
+                }
+            }
         }
 
         public ProductsWithTypesAndBrandsSpecification(int id) : base(x => x.Id == id) 

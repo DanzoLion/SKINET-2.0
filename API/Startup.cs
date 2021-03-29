@@ -42,6 +42,13 @@ namespace API
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));  // access to our database // via connection string and <StoreContext>
             services.AddApplicationServices();
             services.AddSwaggerDocumentation();
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");   // informs API we won't allow unsecure headers via CORS
+                });
+            });
             // services.AddSwaggerGen(c =>
             // {
             //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -80,6 +87,7 @@ namespace API
             app.UseHttpsRedirection();   // automatically re-directs to https
             app.UseRouting();
             app.UseStaticFiles();        // added when we imported our images folder into our project // this is middleware
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
             app.UseSwaggerDocumenation();
             app.UseEndpoints(endpoints =>             // so our application knows which endpoints are available and routed to

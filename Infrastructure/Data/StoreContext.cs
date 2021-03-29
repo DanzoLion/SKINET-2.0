@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Reflection;
 using Core.Entities;
 using Microsoft.EntityFrameworkCore;  //DbContext
@@ -18,6 +19,19 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());          // this builds our tables after we configure them in ProductConfiguration.cs
+
+            if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")            // string so careful with typo error
+            {
+                foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                {
+                    var properties = entityType.ClrType.GetProperties().Where(properties => properties.PropertyType == typeof(decimal));
+
+                    foreach (var property in properties)
+                    {
+                        modelBuilder.Entity(entityType.Name).Property(property.Name).HasConversion<double>();
+                    }
+                }
+            }
         }
     }
 }

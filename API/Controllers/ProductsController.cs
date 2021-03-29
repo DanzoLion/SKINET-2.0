@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using API.Dtos;
 using API.Errors;
+using API.Helpers;
 using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
@@ -36,16 +37,19 @@ namespace API.Controllers {
         }
 
         [HttpGet] // returns below string via https://localhost:5001/api/products/
-        public async Task<ActionResult<IReadOnlyList<ProductToReturnDto>>> GetProducts () // we return ActionResult that is some form of Http resonse ie OK 200 / 400etc
-        { // Task passes off our request to a delegate  // prevents current thread from being blocked
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts ([FromQuery]ProductSpecParams productParams) // we return ActionResult that is some form of Http resonse ie OK 200 / 400etc
+        { // Task passes off our request to a delegate  // prevents current thread from being blocked      // [FromQuery] -> attribute informs API to look for properties in query string 
             // return "this will be a list of products";
         //    var products = await __context.Products.ToListAsync (); // a query that goes to our database .. ToList(); executes select query and returns results in our var producs variable
         //    var products = await _repo.GetProductsAsync(); // a query that goes to our database .. ToList(); executes select query and returns results in our var producs variable
 
-            var spec = new ProductsWithTypesAndBrandsSpecification();   // this method hits our database
-
+            var spec = new ProductsWithTypesAndBrandsSpecification(productParams);   // this method hits our database
+            var countSpec = new ProductsWithTypesAndBrandsSpecification(productParams);
+            var totalItems = await _productsRepo.CountAsync(countSpec);
             var products = await _productsRepo.ListAsync(spec); // a query that goes to our database .. ToList(); executes select query and returns results in our var producs variable
-            return Ok(_mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products));  
+            var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
+
+            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, totalItems, data));  
             //return products.Select(product => new ProductToReturnDto  
         //     {                                                                                                       // at this point we already have our products in memory and we return from memory .. its not in the database
         //       Id = product.Id,
