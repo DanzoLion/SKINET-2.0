@@ -44,7 +44,7 @@ namespace API.Controllers {
         //    var products = await _repo.GetProductsAsync(); // a query that goes to our database .. ToList(); executes select query and returns results in our var producs variable
 
             var spec = new ProductsWithTypesAndBrandsSpecification(productParams);   // this method hits our database
-            var countSpec = new ProductsWithTypesAndBrandsSpecification(productParams);
+            var countSpec = new ProductWithFiltersForCountSpecification(productParams);
             var totalItems = await _productsRepo.CountAsync(countSpec);
             var products = await _productsRepo.ListAsync(spec); // a query that goes to our database .. ToList(); executes select query and returns results in our var producs variable
             var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
