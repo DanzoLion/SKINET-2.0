@@ -1,5 +1,6 @@
 using API.Errors;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -11,6 +12,13 @@ namespace API.Controllers
         {
             _context = context;
         }
+
+[HttpGet("testauth")]
+[Authorize]                                                         // key here is that without [Authorize] we can't acces "secret stuff" unless we are logged in as a user ie with valid JWT token to our server
+public ActionResult<string> GetSecretText()
+{
+    return "secret stuff";
+}
 
 [HttpGet("notfound")]
         public ActionResult GetNotFoundRequest()
