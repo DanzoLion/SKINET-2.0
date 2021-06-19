@@ -14,7 +14,9 @@ namespace API.Helpers
             .ForMember(d => d.ProductType, o => o.MapFrom(s => s.ProductType.Name))
             .ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>());
 
-            CreateMap<Address, AddressDto>().ReverseMap();;     // used after creating AddressDto to avoid cycle confilct when returning UserAddress details // ReverseMap() acts as a reverse mapping function as an option
+            CreateMap<Address, AddressDto>().ReverseMap();     // used after creating AddressDto to avoid cycle confilct when returning UserAddress details // ReverseMap() acts as a reverse mapping function as an option
+            CreateMap<CustomerBasketDto, CustomerBasket>();
+            CreateMap<BasketItemDto, BasketItem>();
         }
     }
 }
