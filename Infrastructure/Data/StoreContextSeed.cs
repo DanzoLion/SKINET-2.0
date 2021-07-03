@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Entities;
+using Core.Entities.OrderAggregate;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Data.SeedData {
@@ -48,6 +49,18 @@ namespace Infrastructure.Data.SeedData {
                 }
 
                 await context.SaveChangesAsync (); // saves all of our product brands into our database
+            }
+
+            if (!context.DeliveryMethods.Any ()) {  // we implement this after we create our OrderAggregate entities context
+                
+                var dmData = File.ReadAllText ("../Infrastructure/Data/SeedData/delivery.json");
+                var methods = JsonSerializer.Deserialize<List<DeliveryMethod>> (dmData); 
+
+                foreach (var item in methods) {
+                    context.DeliveryMethods.Add (item); 
+                }
+
+                await context.SaveChangesAsync ();
             }
         }
 

@@ -13,5 +13,8 @@ namespace Core.Interfaces
          Task<T> GetEntityWithSpec(ISpecification<T> spec);       
          Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
          Task<int> CountAsync(ISpecification<T> spec);
+         void Add(T entity);                                                                // tells entity framework to add and track, update and track, delete and track
+         void Update(T entity);                                                            // NB Repositories don't save changes -> unitOfWork saves the changes
+         void Delete(T entity);
     }
 }

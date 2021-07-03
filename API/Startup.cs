@@ -25,11 +25,11 @@ namespace API
 {
     public class Startup
     {
-        private readonly IConfiguration configuration;
+    //    private readonly IConfiguration configuration;
         private readonly IConfiguration _config;
         public Startup(IConfiguration config)
         {
-            _config = config;
+           _config = config;
         }
 
         // public IConfiguration Configuration { get; }

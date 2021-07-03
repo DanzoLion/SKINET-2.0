@@ -40,6 +40,20 @@ namespace Infrastructure.Data {
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec); // product is converted into a Queryable
         }
 
+        public void Add(T entity)
+        {
+            _context.Set<T>().Add(entity);                      // tracked and implemented as a synchronous method
+        }
 
+        public void Update(T entity)
+        {
+            _context.Set<T>().Attach(entity);                // attaches entity to be changed
+            _context.Entry(entity).State = EntityState.Modified;        // marks the item as modified and adds to list of items to be save in unitofwork
+        }
+
+        public void Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+        }
     }
 }
