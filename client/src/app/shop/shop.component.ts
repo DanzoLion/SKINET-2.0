@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { IBrand } from '../shared/models/brands';
+import { IBrand } from '../shared/models/brand';
 import { IProduct } from '../shared/models/product';
 import { IType } from '../shared/models/productType';
 import { ShopParams } from '../shared/models/shopParams';
@@ -33,7 +33,7 @@ export class ShopComponent implements OnInit {
     this.getTypes();
   }
 
-  getProducts() {
+  /*getProducts() {
     this.shopService.getProducts(this.shopParams).subscribe(response => {
       this.products = response.data;
       this.shopParams.pageNumber = response.pageIndex;
@@ -42,7 +42,16 @@ export class ShopComponent implements OnInit {
     }, error => {
       console.log(error);
     });
+  }*/
+  getProducts(useCache = false) {
+    this.shopService.getProducts(useCache).subscribe(response => {
+      this.products = response.data;
+      this.totalCount = response.count;
+    }, error => {
+      console.log(error);
+    })
   }
+
 
   getBrands() {
     this.shopService.getBrands().subscribe(response => {
@@ -93,7 +102,7 @@ onSearch() {
 }
 
 onReset() {
-  this.searchTerm.nativeElement.value = ' '
+  this.searchTerm.nativeElement.value = ' ';
   this.shopParams = new ShopParams();
   this.getProducts();
 }
