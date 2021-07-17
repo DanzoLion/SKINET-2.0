@@ -9,7 +9,7 @@ namespace Core.Entities.OrderAggregate
         {
         }
 
-        public Order(IReadOnlyList<OrderItem> orderItems, string buyerEmail, Address shipToAddress, DeliveryMethod deliveryMethod,  decimal subtotal)
+        public Order(IReadOnlyList<OrderItem> orderItems, string buyerEmail, Address shipToAddress, DeliveryMethod deliveryMethod,  decimal subtotal, string paymentIntentId)
         {
             BuyerEmail = buyerEmail;
 //            OrderDate = orderDate;                                                              // is already being set inside our class
@@ -19,6 +19,7 @@ namespace Core.Entities.OrderAggregate
             Subtotal = subtotal;
 //           Status = status;                                                                           // is already being set inside our class
 //            PaymentIntentId = paymentIntentId;                                        // not required
+            PaymentIntentId = paymentIntentId;                              // for payment adjustments -> OrderService.cs to include paymentIntentId
         }
 
         public string BuyerEmail {get;set;}

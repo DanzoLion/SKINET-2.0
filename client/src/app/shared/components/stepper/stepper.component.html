@@ -3,10 +3,12 @@
         <li class="nav-item" *ngFor="let step of steps; let i = index">
             <button
                 (click)="onClick(i)"
-                [disabled]="true"
+               
+                [disabled]="false"
                 [class.active]="selectedIndex === i"
                 class="nav-link py-3 text-uppercase font-weight-bold btn-block">
                 {{step.label}}
+               <!-- {{step.label}}:{{step.completed}} -->
             </button>
         </li>
     </ul>
