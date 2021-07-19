@@ -13,6 +13,7 @@ namespace API.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddSingleton<IResponseCacheService, ResponseCacheService>();    // implemented far caching service, needs to be a singleton and shared across all services
             services.AddScoped<ITokenService, TokenService>();                          // for identity
             services.AddScoped<IOrderService, OrderService>();                          // order services to extract from new database migration
             services.AddScoped<IUnitOfWork, UnitOfWork>();                              // unit of work implementation // we then implement in order service

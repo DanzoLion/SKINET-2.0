@@ -36,6 +36,7 @@ namespace API.Controllers {
             //     __context = _context;                                                              // replaced with instance of rep
         }
 
+        [Cached(600)]
         [HttpGet] // returns below string via https://localhost:5001/api/products/
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts ([FromQuery]ProductSpecParams productParams) // we return ActionResult that is some form of Http resonse ie OK 200 / 400etc
         { // Task passes off our request to a delegate  // prevents current thread from being blocked      // [FromQuery] -> attribute informs API to look for properties in query string 
@@ -62,6 +63,7 @@ namespace API.Controllers {
         //   }).ToList();                                                                      // we return the properties we want from our product and return it into a list
         }
 
+        [Cached(600)]
         [HttpGet ("{id}")] // differentiates our attribute via {id} // https://localhost:5001/api/products/123
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]     // these attributes allow us to be more specific about the error codes represented in swagger
@@ -88,6 +90,7 @@ namespace API.Controllers {
         //   };
         }
 
+        [Cached(600)]                                                                                        // our own cache attribute we built, holds in cache for 600 seconds
         [HttpGet("brands")]
 
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
@@ -96,6 +99,7 @@ namespace API.Controllers {
             return Ok(await _productBrandRepo.ListAllAsync());                         // we wrap into Ok method as we are retrieving from an unsopported type
         }
 
+        [Cached(600)]
         [HttpGet("types")]
 
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
