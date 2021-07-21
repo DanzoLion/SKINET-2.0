@@ -1,3 +1,4 @@
+using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using Microsoft.Extensions.FileProviders;
 
 namespace API
 {
@@ -41,11 +43,12 @@ namespace API
             // services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));  // we don't know the type, and the type is collected at compile/run-time so slightly different config here
             services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();                                                                                                                                          // gives access to endpoints added as a service
-            services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));  // access to our database // via connection string and <StoreContext>
+           // services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));  // access to our database // via connection string and <StoreContext>
+            services.AddDbContext<StoreContext>(x => x.UseNpgsql(_config.GetConnectionString("DefaultConnection")));  // access to our database // via connection string and <StoreContext>
            
             services.AddDbContext<AppIdentityDbContext>(x => 
             {
-                x.UseSqlite(_config.GetConnectionString("IdentityConnection"));
+                x.UseNpgsql(_config.GetConnectionString("IdentityConnection"));
             });
 
         services.AddSingleton<IConnectionMultiplexer>(c => {
@@ -100,7 +103,15 @@ namespace API
             app.UseStatusCodePagesWithReExecute("/errors/{0}"); // if request endpoint does not match this middleware gets triggered -> redirects to ErrorController.cs and passes in code {0} / 404 not found
             app.UseHttpsRedirection();   // automatically re-directs to https
             app.UseRouting();
-            app.UseStaticFiles();        // added when we imported our images folder into our project // this is middleware
+            app.UseStaticFiles();        // added when we imported our images folder into our project // this is middleware // serves everything inside wwwroot folder
+
+            app.UseStaticFiles(new StaticFileOptions           // implemented after we moved images from wwwroot to Content folder // we then update appsettings.Development.json ApiUrl
+            {
+                FileProvider = new PhysicalFileProvider(                            
+                    Path.Combine(Directory.GetCurrentDirectory(), "Content")          
+                ), RequestPath = "/content"
+            });
+
             app.UseCors("CorsPolicy");
             app.UseAuthentication();                // implemented after setting up identity to use the token
             app.UseAuthorization();
@@ -108,6 +119,7 @@ namespace API
             app.UseEndpoints(endpoints =>             // so our application knows which endpoints are available and routed to
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToController("Index", "Fallback");            // an endpoint for angular // we then create the controller that will manage this
             });
         }
     }

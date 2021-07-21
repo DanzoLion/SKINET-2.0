@@ -1,3 +1,4 @@
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,9 +17,13 @@ namespace Infrastructure.Data.SeedData {
         public static async Task SeedAsync (StoreContext context, ILoggerFactory loggerFactory) {
             try // we're running the seed method from our program.cs so we don't have global exception handling here
             {
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);    // we set this up after pulishing our application and after PostgreSQL migration
+
                 if (!context.ProductBrands.Any ()) // conditionals for product brands // we also do the same for productTypes and productLists ..
                 {
-                    var brandsData = File.ReadAllText ("../Infrastructure/Data/SeedData/brands.json");
+                   // var brandsData = File.ReadAllText ("../Infrastructure/Data/SeedData/brands.json");             // publishing configuration change .. change to location directory
+                    var brandsData = File.ReadAllText (path + @"/Data/SeedData/brands.json");
+                   
                     var brands = JsonSerializer.Deserialize<List<ProductBrand>> (brandsData); // deserializes into a list of our products with brandsData
 
                     foreach (var item in brands) {
@@ -30,7 +35,7 @@ namespace Infrastructure.Data.SeedData {
             
 
             if (!context.ProductTypes.Any ()) {
-                var typesData = File.ReadAllText ("../Infrastructure/Data/SeedData/types.json");
+                var typesData = File.ReadAllText (path + @"/Data/SeedData/types.json");           // path adjusted for publishing
                 var types = JsonSerializer.Deserialize<List<ProductType>> (typesData); // deserializes into a list of our products with brandsData
 
                 foreach (var item in types) {
@@ -41,7 +46,7 @@ namespace Infrastructure.Data.SeedData {
             }
 
             if (!context.Products.Any ()) {
-                var productsData = File.ReadAllText ("../Infrastructure/Data/SeedData/products.json");
+                var productsData = File.ReadAllText (path + @"/Data/SeedData/products.json");            // path adjusted for publishing
                 var products = JsonSerializer.Deserialize<List<Product>> (productsData); // deserializes into a list of our products with brandsData
 
                 foreach (var item in products) {
@@ -53,7 +58,7 @@ namespace Infrastructure.Data.SeedData {
 
             if (!context.DeliveryMethods.Any ()) {  // we implement this after we create our OrderAggregate entities context
                 
-                var dmData = File.ReadAllText ("../Infrastructure/Data/SeedData/delivery.json");
+                var dmData = File.ReadAllText (path + @"/Data/SeedData/delivery.json");                        // path adjusted for publishing
                 var methods = JsonSerializer.Deserialize<List<DeliveryMethod>> (dmData); 
 
                 foreach (var item in methods) {
